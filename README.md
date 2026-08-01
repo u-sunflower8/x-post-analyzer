@@ -5,7 +5,17 @@ X（旧Twitter）の投稿CSVエクスポートをAIが分析し、伸びる投�
 
 ## スクリーンショット
 
-<!-- TODO: 画面キャプチャを追加 -->
+| CSVアップロード | CSV作成（スクショ取込） |
+|---|---|
+| ![CSVアップロード](./docs/screenshots/csv-upload.png) | ![CSV作成](./docs/screenshots/csv-builder.png) |
+
+| 投稿ランキング | AI分析 |
+|---|---|
+| ![投稿ランキング](./docs/screenshots/ranking.png) | ![AI分析](./docs/screenshots/ai-analysis.png) |
+
+| 投稿生成 |
+|---|
+| ![投稿生成](./docs/screenshots/post-generator.png) |
 
 ## 技術スタック
 

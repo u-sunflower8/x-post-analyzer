@@ -75,11 +75,16 @@ export const generateRequestSchema = z.object({
   accountSummary: accountSummarySchema,
 });
 
+const basedOnPattern = z.preprocess(
+  (value) => (Array.isArray(value) ? value.join(', ') : value),
+  z.string(),
+);
+
 export const postDraftSchema = z.object({
   id: z.coerce.string(),
   text: z.string(),
   rationale: z.string(),
-  basedOnPattern: z.string(),
+  basedOnPattern,
 });
 
 export const generateResponseSchema = z.object({
