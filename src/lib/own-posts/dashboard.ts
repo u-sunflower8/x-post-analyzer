@@ -1,6 +1,6 @@
 import type { DashboardKpis, OwnPostWithMetrics } from "@/types/own-post";
 import { aggregateByHour, aggregateByDayOfWeek, bestBucket } from "./aggregate";
-import { totalEngagements } from "./metrics";
+import { likesAndReposts, totalEngagements } from "./metrics";
 
 function median(values: number[]): number {
   if (values.length === 0) return 0;
@@ -15,8 +15,8 @@ export function computeDashboardKpis(posts: OwnPostWithMetrics[]): DashboardKpis
       totalPosts: 0,
       totalImpressions: 0,
       totalEngagements: 0,
-      avgEngagementRate: 0,
-      medianEngagementRate: 0,
+      avgLikesAndReposts: 0,
+      medianLikesAndReposts: 0,
       avgImpressionsPerPost: 0,
       bestPostingHour: null,
       bestPostingDayOfWeek: null,
@@ -29,7 +29,7 @@ export function computeDashboardKpis(posts: OwnPostWithMetrics[]): DashboardKpis
   const totalImpressions = posts.reduce((sum, p) => sum + (p.impressionCount ?? 0), 0);
   const totalEng = posts.reduce((sum, p) => sum + totalEngagements(p), 0);
   const totalFollowsGained = posts.reduce((sum, p) => sum + (p.followCount ?? 0), 0);
-  const rates = posts.map((p) => p.metrics.engagementRate).filter((r): r is number => r !== null);
+  const scores = posts.map(likesAndReposts);
   const createdAtTimes = posts
     .map((p) => new Date(p.postedAt ?? p.createdAt).getTime())
     .filter((t) => !Number.isNaN(t));
@@ -41,8 +41,8 @@ export function computeDashboardKpis(posts: OwnPostWithMetrics[]): DashboardKpis
     totalPosts: posts.length,
     totalImpressions,
     totalEngagements: totalEng,
-    avgEngagementRate: totalImpressions > 0 ? totalEng / totalImpressions : 0,
-    medianEngagementRate: median(rates),
+    avgLikesAndReposts: scores.reduce((sum, s) => sum + s, 0) / posts.length,
+    medianLikesAndReposts: median(scores),
     avgImpressionsPerPost: totalImpressions / posts.length,
     bestPostingHour: hourBest ? Number(hourBest.label) : null,
     bestPostingDayOfWeek: dayBest ? ["日", "月", "火", "水", "木", "金", "土"].indexOf(dayBest.label) : null,

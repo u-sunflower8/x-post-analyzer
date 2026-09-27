@@ -45,8 +45,7 @@ export interface OwnPostWithMetrics extends OwnPost {
 
 export interface BucketStat {
   label: string;
-  avgEngagementRate: number;
-  /** Avg likes + reposts per post. Works without impressions (X archive imports have none). */
+  /** Avg likes + reposts per post. Impressions are not used for ranking (X archive imports have none). */
   avgLikesAndReposts: number;
   postCount: number;
 }
@@ -55,8 +54,8 @@ export interface DashboardKpis {
   totalPosts: number;
   totalImpressions: number;
   totalEngagements: number;
-  avgEngagementRate: number;
-  medianEngagementRate: number;
+  avgLikesAndReposts: number;
+  medianLikesAndReposts: number;
   avgImpressionsPerPost: number;
   bestPostingHour: number | null;
   bestPostingDayOfWeek: number | null;
@@ -69,10 +68,8 @@ export interface PostBrief {
   id: string;
   text: string;
   createdAt: string | null;
-  engagementRate: number | null;
   likes: number;
   retweets: number;
-  impressions: number;
   charCount: number;
 }
 
@@ -80,15 +77,14 @@ export interface AccountSummary {
   postCount: number;
   dateRangeStart: string | null;
   dateRangeEnd: string | null;
-  avgEngagementRate: number;
-  medianEngagementRate: number;
-  avgImpressions: number;
+  avgLikesAndReposts: number;
+  medianLikesAndReposts: number;
 }
 
 export interface KeywordStat {
   keyword: string;
   occurrences: number;
-  avgEngagementRate: number;
+  avgLikesAndReposts: number;
 }
 
 export interface AnalyzeRequest {
