@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getAnalysisById, insertGeneratedIdeas } from "@/lib/db/queries";
 import { generateIdeas } from "@/lib/openai/generateBuzzIdeas";
 import { MissingApiKeyError } from "@/lib/openai/client";
-import { ideaRowToIdea } from "@/lib/supabase/mappers";
-import type { AnalysisRow, GeneratedIdeaRow } from "@/lib/supabase/types";
+import { ideaRowToIdea } from "@/lib/db/mappers";
 import type { StructureAbstract } from "@/lib/openai/schemas";
 
 export async function POST(request: Request) {
@@ -19,22 +18,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "analysisId and genre are required" }, { status: 400 });
   }
 
-  const supabase = getSupabaseServerClient();
-
-  const { data: analysisRow, error: analysisError } = await supabase
-    .from("analyses")
-    .select("*")
-    .eq("id", analysisId)
-    .maybeSingle();
-
-  if (analysisError) {
-    return NextResponse.json({ error: analysisError.message }, { status: 500 });
-  }
+  const analysisRow = await getAnalysisById(analysisId);
   if (!analysisRow) {
     return NextResponse.json({ error: "Analysis not found" }, { status: 404 });
   }
 
-  const structureAbstract = (analysisRow as AnalysisRow).structure_abstract as unknown as StructureAbstract;
+  const structureAbstract = analysisRow.structure_abstract as unknown as StructureAbstract;
 
   let generated;
   try {
@@ -47,15 +36,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 502 });
   }
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("generated_ideas")
-    .insert(generated.ideas.map((idea) => ({ analysis_id: analysisId, genre, idea_text: idea.text })))
-    .select("*");
+  const inserted = await insertGeneratedIdeas(
+    analysisId,
+    genre,
+    generated.ideas.map((idea) => idea.text),
+  );
 
-  if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
-  }
-
-  const ideas = ((inserted ?? []) as GeneratedIdeaRow[]).map(ideaRowToIdea);
-  return NextResponse.json({ ideas });
+  return NextResponse.json({ ideas: inserted.map(ideaRowToIdea) });
 }

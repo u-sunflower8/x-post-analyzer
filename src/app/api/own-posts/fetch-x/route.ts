@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { fetchOwnTimeline } from "@/lib/x-api/own-timeline";
 import { XApiNotConfiguredError } from "@/lib/x-api/client";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ownPostRowToOwnPost } from "@/lib/supabase/mappers";
-import type { OwnPostRow } from "@/lib/supabase/types";
+import { upsertOwnPosts } from "@/lib/db/queries";
+import { ownPostRowToOwnPost } from "@/lib/db/mappers";
+import type { OwnPostRow } from "@/lib/db/types";
 import type { OwnPost } from "@/types/own-post";
 
 export async function POST(request: Request) {
@@ -52,15 +52,13 @@ export async function POST(request: Request) {
     is_promoted: p.isPromoted,
   }));
 
-  const { data, error } = await getSupabaseServerClient()
-    .from("own_posts")
-    .upsert(rows, { onConflict: "id" })
-    .select("*");
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  let inserted: OwnPost[];
+  try {
+    inserted = (await upsertOwnPosts(rows)).map(ownPostRowToOwnPost);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Database write failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
-  const inserted = ((data ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost);
   return NextResponse.json({ posts: inserted, count: inserted.length });
 }

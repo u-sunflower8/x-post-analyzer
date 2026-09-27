@@ -1,25 +1,16 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ownPostRowToOwnPost } from "@/lib/supabase/mappers";
+import { listOwnPosts, upsertOwnPosts } from "@/lib/db/queries";
+import { ownPostRowToOwnPost } from "@/lib/db/mappers";
 import { withMetrics } from "@/lib/own-posts/metrics";
-import type { OwnPostRow } from "@/lib/supabase/types";
+import type { OwnPostRow } from "@/lib/db/types";
 import type { OwnPost } from "@/types/own-post";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get("limit") ?? 50) || 50, 200);
 
-  const { data, error } = await getSupabaseServerClient()
-    .from("own_posts")
-    .select("*")
-    .order("posted_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const posts = ((data ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost).map(withMetrics);
+  const rows = await listOwnPosts(limit);
+  const posts = rows.map(ownPostRowToOwnPost).map(withMetrics);
   return NextResponse.json({ posts });
 }
 
@@ -30,8 +21,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "posts is required" }, { status: 400 });
   }
 
-  // created_at はDB側の「取り込み時刻」を表すため、クライアント側の値では上書きしない
-  // （挿入時はDEFAULT now()、既存行の更新時は元の値を保持する）。
   const rows: Omit<OwnPostRow, "created_at">[] = posts.map((p) => ({
     id: p.id,
     source: p.source,
@@ -54,15 +43,6 @@ export async function POST(request: Request) {
     is_promoted: p.isPromoted,
   }));
 
-  const { data, error } = await getSupabaseServerClient()
-    .from("own_posts")
-    .upsert(rows, { onConflict: "id" })
-    .select("*");
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const inserted = ((data ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost);
-  return NextResponse.json({ posts: inserted, count: inserted.length });
+  const inserted = await upsertOwnPosts(rows);
+  return NextResponse.json({ posts: inserted.map(ownPostRowToOwnPost), count: inserted.length });
 }

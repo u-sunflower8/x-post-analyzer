@@ -42,14 +42,14 @@ function EngagementBarChart({ title, data }: { title: string; data: BucketStat[]
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} tick={{ fontSize: 11 }} />
+              <YAxis tickFormatter={(v) => formatCount(v)} tick={{ fontSize: 11 }} />
               <Tooltip
                 formatter={(value, _name, item) => [
-                  `${formatPercent(Number(value ?? 0))}（${(item.payload as BucketStat).postCount}件）`,
-                  "平均エンゲージメント率",
+                  `${Number(value ?? 0).toFixed(1)}（${(item.payload as BucketStat).postCount}件）`,
+                  "平均いいね＋リポスト",
                 ]}
               />
-              <Bar dataKey="avgEngagementRate">
+              <Bar dataKey="avgLikesAndReposts">
                 {data.map((entry, i) => (
                   <Cell key={i} fillOpacity={entry.postCount < 3 ? 0.35 : 1} fill="#171717" />
                 ))}
@@ -94,9 +94,9 @@ export function DashboardClient({
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <EngagementBarChart title="時間帯別エンゲージメント率" data={hourBuckets} />
-        <EngagementBarChart title="曜日別エンゲージメント率" data={dayOfWeekBuckets} />
-        <EngagementBarChart title="文字数別エンゲージメント率" data={charCountBuckets} />
+        <EngagementBarChart title="時間帯別 平均いいね＋リポスト" data={hourBuckets} />
+        <EngagementBarChart title="曜日別 平均いいね＋リポスト" data={dayOfWeekBuckets} />
+        <EngagementBarChart title="文字数別 平均いいね＋リポスト" data={charCountBuckets} />
       </div>
     </div>
   );

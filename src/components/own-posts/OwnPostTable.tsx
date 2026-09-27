@@ -22,6 +22,7 @@ function formatCount(n: number) {
 function formatDate(iso: string | null) {
   if (!iso) return "-";
   return new Date(iso).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
     month: "numeric",
     day: "numeric",
     hour: "2-digit",

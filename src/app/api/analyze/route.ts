@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getLatestAnalysisByPostId, getPostById, insertAnalysis } from "@/lib/db/queries";
 import { analyzePost } from "@/lib/openai/analyzeBuzzPost";
 import { MODEL, MissingApiKeyError } from "@/lib/openai/client";
-import { analysisRowToAnalysis } from "@/lib/supabase/mappers";
-import type { AnalysisRow, PostRow } from "@/lib/supabase/types";
+import { analysisRowToAnalysis } from "@/lib/db/mappers";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { postId?: string; force?: boolean } | null;
@@ -12,39 +11,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "postId is required" }, { status: 400 });
   }
 
-  const supabase = getSupabaseServerClient();
-
   if (!body?.force) {
-    const { data: existing, error } = await supabase
-      .from("analyses")
-      .select("*")
-      .eq("post_id", postId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const existing = await getLatestAnalysisByPostId(postId);
     if (existing) {
-      return NextResponse.json({ analysis: analysisRowToAnalysis(existing as AnalysisRow), cached: true });
+      return NextResponse.json({ analysis: analysisRowToAnalysis(existing), cached: true });
     }
   }
 
-  const { data: postRow, error: postError } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", postId)
-    .maybeSingle();
-
-  if (postError) {
-    return NextResponse.json({ error: postError.message }, { status: 500 });
-  }
-  if (!postRow) {
+  const post = await getPostById(postId);
+  if (!post) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
-
-  const post = postRow as PostRow;
 
   let result;
   try {
@@ -63,20 +40,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 502 });
   }
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("analyses")
-    .insert({
-      post_id: postId,
-      model: MODEL,
-      result,
-      structure_abstract: result.structureAbstract,
-    })
-    .select("*")
-    .single();
+  const inserted = await insertAnalysis({
+    postId,
+    model: MODEL,
+    result,
+    structureAbstract: result.structureAbstract,
+  });
 
-  if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ analysis: analysisRowToAnalysis(inserted as AnalysisRow), cached: false });
+  return NextResponse.json({ analysis: analysisRowToAnalysis(inserted), cached: false });
 }

@@ -46,6 +46,8 @@ export interface OwnPostWithMetrics extends OwnPost {
 export interface BucketStat {
   label: string;
   avgEngagementRate: number;
+  /** Avg likes + reposts per post. Works without impressions (X archive imports have none). */
+  avgLikesAndReposts: number;
   postCount: number;
 }
 

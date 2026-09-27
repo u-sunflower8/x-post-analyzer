@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { OwnPostWithMetrics } from "@/types/own-post";
-import type { OwnPostSuggestion } from "@/lib/supabase/mappers";
+import type { OwnPostSuggestion } from "@/lib/db/mappers";
 
 function formatNumber(n: number | null) {
   if (n === null) return "—";

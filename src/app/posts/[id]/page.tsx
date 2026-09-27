@@ -1,28 +1,20 @@
 import { notFound } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { postRowToPost, analysisRowToAnalysis } from "@/lib/supabase/mappers";
-import type { PostRow, AnalysisRow } from "@/lib/supabase/types";
+import { getPostById, getLatestAnalysisByPostId } from "@/lib/db/queries";
+import { postRowToPost, analysisRowToAnalysis } from "@/lib/db/mappers";
 import { PostDetailClient } from "@/components/analysis/PostDetailClient";
 
 export default async function PostDetailPage({ params }: PageProps<"/posts/[id]">) {
   const { id } = await params;
-  const supabase = getSupabaseServerClient();
 
-  const { data: postRow } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+  const postRow = await getPostById(id);
   if (!postRow) notFound();
 
-  const { data: analysisRow } = await supabase
-    .from("analyses")
-    .select("*")
-    .eq("post_id", id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const analysisRow = await getLatestAnalysisByPostId(id);
 
   return (
     <PostDetailClient
-      post={postRowToPost(postRow as PostRow)}
-      initialAnalysis={analysisRow ? analysisRowToAnalysis(analysisRow as AnalysisRow) : null}
+      post={postRowToPost(postRow)}
+      initialAnalysis={analysisRow ? analysisRowToAnalysis(analysisRow) : null}
     />
   );
 }

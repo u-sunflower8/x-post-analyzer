@@ -1,7 +1,6 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ownPostRowToOwnPost } from "@/lib/supabase/mappers";
+import { listOwnPosts } from "@/lib/db/queries";
+import { ownPostRowToOwnPost } from "@/lib/db/mappers";
 import { withMetrics } from "@/lib/own-posts/metrics";
-import type { OwnPostRow } from "@/lib/supabase/types";
 import { OwnPostTable } from "@/components/own-posts/OwnPostTable";
 import { CsvUploadDialog } from "@/components/own-posts/CsvUploadDialog";
 import { ScreenshotImportDialog } from "@/components/own-posts/ScreenshotImportDialog";
@@ -10,13 +9,8 @@ import { FetchFromXDialog } from "@/components/own-posts/FetchFromXDialog";
 export const dynamic = "force-dynamic";
 
 export default async function OwnPostsPage() {
-  const { data } = await getSupabaseServerClient()
-    .from("own_posts")
-    .select("*")
-    .order("posted_at", { ascending: false })
-    .limit(200);
-
-  const posts = ((data ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost).map(withMetrics);
+  const rows = await listOwnPosts(200);
+  const posts = rows.map(ownPostRowToOwnPost).map(withMetrics);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">

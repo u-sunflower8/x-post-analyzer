@@ -1,16 +1,15 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ownPostRowToOwnPost } from "@/lib/supabase/mappers";
+import { listAllOwnPosts } from "@/lib/db/queries";
+import { ownPostRowToOwnPost } from "@/lib/db/mappers";
 import { withMetrics } from "@/lib/own-posts/metrics";
 import { computeDashboardKpis } from "@/lib/own-posts/dashboard";
 import { aggregateByHour, aggregateByDayOfWeek, aggregateByCharCount } from "@/lib/own-posts/aggregate";
-import type { OwnPostRow } from "@/lib/supabase/types";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const { data } = await getSupabaseServerClient().from("own_posts").select("*");
-  const posts = ((data ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost).map(withMetrics);
+  const rows = await listAllOwnPosts();
+  const posts = rows.map(ownPostRowToOwnPost).map(withMetrics);
 
   const kpis = computeDashboardKpis(posts);
   const hourBuckets = aggregateByHour(posts);

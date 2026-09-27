@@ -10,7 +10,7 @@ import { ScoreBadge } from "@/components/posts/ScoreBadge";
 import { AnalysisPanel } from "./AnalysisPanel";
 import { GenerateForm } from "@/components/generate/GenerateForm";
 import type { Post } from "@/types/post";
-import type { AnalysisWithAbstract } from "@/lib/supabase/mappers";
+import type { AnalysisWithAbstract } from "@/lib/db/mappers";
 
 export function PostDetailClient({
   post,

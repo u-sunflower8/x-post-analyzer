@@ -23,11 +23,30 @@ function charCountBucket(charCount: number): CharCountBucket {
   return "281+";
 }
 
+// Server runs in UTC on Vercel, so getHours()/getDay() would bucket by UTC.
+// The account posts to a Japanese audience — bucket by JST instead.
+const JST_PARTS = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Tokyo",
+  hour: "numeric",
+  hourCycle: "h23",
+  weekday: "short",
+});
+const WEEKDAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+function jstHourAndDay(date: Date): { hour: number; day: number } {
+  const parts = JST_PARTS.formatToParts(date);
+  return {
+    hour: Number(parts.find((p) => p.type === "hour")?.value),
+    day: WEEKDAY_INDEX[parts.find((p) => p.type === "weekday")?.value ?? ""],
+  };
+}
+
 export function computeEngagementMetrics(post: OwnPost): OwnPostMetrics {
   const impressions = post.impressionCount;
   const engagementRate = rate(totalEngagements(post), impressions);
   const createdAt = new Date(post.postedAt ?? post.createdAt);
   const clicks = (post.urlClickCount ?? 0) + (post.permalinkClickCount ?? 0);
+  const jst = jstHourAndDay(createdAt);
 
   return {
     postId: post.id,
@@ -38,8 +57,8 @@ export function computeEngagementMetrics(post: OwnPost): OwnPostMetrics {
     clickThroughRate: rate(clicks, impressions),
     followRate: rate(post.followCount ?? 0, impressions),
     engagementScore: (engagementRate ?? 0) * Math.log10((impressions ?? 0) + 1),
-    dayOfWeek: createdAt.getDay(),
-    hourOfDay: createdAt.getHours(),
+    dayOfWeek: jst.day,
+    hourOfDay: jst.hour,
     charCountBucket: charCountBucket(Array.from(post.text).length),
   };
 }

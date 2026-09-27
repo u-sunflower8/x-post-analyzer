@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { WINNING_PATTERN_CATEGORY_LABELS } from "@/lib/openai/labels";
 import type { AnalyzeResponse, PostDraft, WinningPatternCategory } from "@/types/own-post";
-import type { OwnPostAnalysis } from "@/lib/supabase/mappers";
+import type { OwnPostAnalysis } from "@/lib/db/mappers";
 
 const CATEGORY_ICONS: Record<WinningPatternCategory, typeof Clock> = {
   timing: Clock,

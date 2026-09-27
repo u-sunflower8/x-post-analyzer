@@ -14,10 +14,12 @@ function bucketize(posts: OwnPostWithMetrics[], keyFn: (post: OwnPostWithMetrics
   return Array.from(groups.entries()).map(([label, group]) => {
     const totalImpressions = group.reduce((sum, p) => sum + (p.impressionCount ?? 0), 0);
     const totalEng = group.reduce((sum, p) => sum + totalEngagements(p), 0);
+    const totalLikesAndReposts = group.reduce((sum, p) => sum + p.likeCount + p.repostCount, 0);
     return {
       label,
       postCount: group.length,
       avgEngagementRate: totalImpressions > 0 ? totalEng / totalImpressions : 0,
+      avgLikesAndReposts: totalLikesAndReposts / group.length,
     };
   });
 }
@@ -30,7 +32,7 @@ export function aggregateByHour(posts: OwnPostWithMetrics[]): BucketStat[] {
   const stats = bucketize(posts, (p) => String(p.metrics.hourOfDay));
   const byLabel = new Map(stats.map((s) => [s.label, s]));
   return HOUR_LABELS.map(
-    (h) => byLabel.get(String(Number(h))) ?? { label: h, avgEngagementRate: 0, postCount: 0 },
+    (h) => byLabel.get(String(Number(h))) ?? { label: h, avgEngagementRate: 0, avgLikesAndReposts: 0, postCount: 0 },
   ).map((s, i) => ({ ...s, label: HOUR_LABELS[i] }));
 }
 
@@ -38,7 +40,7 @@ export function aggregateByDayOfWeek(posts: OwnPostWithMetrics[]): BucketStat[] 
   const stats = bucketize(posts, (p) => String(p.metrics.dayOfWeek));
   const byLabel = new Map(stats.map((s) => [s.label, s]));
   return DAY_LABELS.map(
-    (_, i) => byLabel.get(String(i)) ?? { label: "", avgEngagementRate: 0, postCount: 0 },
+    (_, i) => byLabel.get(String(i)) ?? { label: "", avgEngagementRate: 0, avgLikesAndReposts: 0, postCount: 0 },
   ).map((s, i) => ({ ...s, label: DAY_LABELS[i] }));
 }
 
@@ -46,12 +48,14 @@ export function aggregateByCharCount(posts: OwnPostWithMetrics[]): BucketStat[] 
   const stats = bucketize(posts, (p) => p.metrics.charCountBucket);
   const byLabel = new Map(stats.map((s) => [s.label, s]));
   return CHAR_COUNT_BUCKET_ORDER.map(
-    (label) => byLabel.get(label) ?? { label, avgEngagementRate: 0, postCount: 0 },
+    (label) => byLabel.get(label) ?? { label, avgEngagementRate: 0, avgLikesAndReposts: 0, postCount: 0 },
   );
 }
 
+// Ranked by likes + reposts per post rather than engagement rate: most posts
+// come from the X archive, which has no impression counts.
 export function bestBucket(buckets: BucketStat[]): BucketStat | null {
   const eligible = buckets.filter((b) => b.postCount >= MIN_BUCKET_SAMPLE_SIZE);
   if (eligible.length === 0) return null;
-  return eligible.reduce((best, b) => (b.avgEngagementRate > best.avgEngagementRate ? b : best));
+  return eligible.reduce((best, b) => (b.avgLikesAndReposts > best.avgLikesAndReposts ? b : best));
 }

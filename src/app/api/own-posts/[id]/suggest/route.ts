@@ -1,57 +1,30 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ownPostRowToOwnPost, ownPostSuggestionRowToSuggestion } from "@/lib/supabase/mappers";
+import { getLatestSuggestionByOwnPostId, getOwnPostById, listAllOwnPosts, insertSuggestion } from "@/lib/db/queries";
+import { ownPostRowToOwnPost, ownPostSuggestionRowToSuggestion } from "@/lib/db/mappers";
 import { withMetrics } from "@/lib/own-posts/metrics";
 import { toPostBrief, buildAccountSummary } from "@/lib/own-posts/payload";
 import { suggestImprovement } from "@/lib/openai/suggestImprovement";
 import { MissingApiKeyError } from "@/lib/openai/client";
-import type { OwnPostRow, OwnPostSuggestionRow } from "@/lib/supabase/types";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = (await request.json().catch(() => ({}))) as { force?: boolean };
-  const supabase = getSupabaseServerClient();
 
   if (!body.force) {
-    const { data: existing, error } = await supabase
-      .from("own_post_suggestions")
-      .select("*")
-      .eq("own_post_id", id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const existing = await getLatestSuggestionByOwnPostId(id);
     if (existing) {
-      return NextResponse.json({
-        suggestion: ownPostSuggestionRowToSuggestion(existing as OwnPostSuggestionRow),
-        cached: true,
-      });
+      return NextResponse.json({ suggestion: ownPostSuggestionRowToSuggestion(existing), cached: true });
     }
   }
 
-  const { data: postRow, error: postError } = await supabase
-    .from("own_posts")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (postError) {
-    return NextResponse.json({ error: postError.message }, { status: 500 });
-  }
+  const postRow = await getOwnPostById(id);
   if (!postRow) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  const { data: allRows, error: allError } = await supabase.from("own_posts").select("*");
-  if (allError) {
-    return NextResponse.json({ error: allError.message }, { status: 500 });
-  }
-
-  const allPosts = ((allRows ?? []) as OwnPostRow[]).map(ownPostRowToOwnPost).map(withMetrics);
-  const post = withMetrics(ownPostRowToOwnPost(postRow as OwnPostRow));
+  const allRows = await listAllOwnPosts();
+  const allPosts = allRows.map(ownPostRowToOwnPost).map(withMetrics);
+  const post = withMetrics(ownPostRowToOwnPost(postRow));
 
   let result;
   try {
@@ -67,18 +40,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: message }, { status: 502 });
   }
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("own_post_suggestions")
-    .insert({ own_post_id: id, result })
-    .select("*")
-    .single();
-
-  if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
-  }
+  const inserted = await insertSuggestion(id, result);
 
   return NextResponse.json({
-    suggestion: ownPostSuggestionRowToSuggestion(inserted as OwnPostSuggestionRow),
+    suggestion: ownPostSuggestionRowToSuggestion(inserted),
     cached: false,
   });
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { searchRecentTweets, XApiNotConfiguredError } from "@/lib/x-api/client";
 import { computeEngagementScores } from "@/lib/scoring";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import type { PostRow } from "@/lib/supabase/types";
+import { upsertPosts } from "@/lib/db/queries";
+import type { PostRow } from "@/lib/db/types";
 import type { Post, SearchParams } from "@/types/post";
 
 export async function POST(request: Request) {
@@ -93,10 +93,11 @@ export async function POST(request: Request) {
       fetched_at: p.fetchedAt,
     }));
 
-    const { error } = await getSupabaseServerClient().from("posts").upsert(rows, { onConflict: "id" });
-    if (error) {
+    try {
+      await upsertPosts(rows);
+    } catch (error) {
       // Cache write failures shouldn't block returning fresh results to the user.
-      console.error("Failed to cache posts in Supabase:", error.message);
+      console.error("Failed to cache posts:", error instanceof Error ? error.message : error);
     }
   }
 

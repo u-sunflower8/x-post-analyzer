@@ -1,19 +1,13 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getLatestOwnPostAnalysis } from "@/lib/db/queries";
 
 export const dynamic = "force-dynamic";
-import { ownPostAnalysisRowToAnalysis } from "@/lib/supabase/mappers";
-import type { OwnPostAnalysisRow } from "@/lib/supabase/types";
+import { ownPostAnalysisRowToAnalysis } from "@/lib/db/mappers";
 import { WinningPatternsClient } from "@/components/analysis/WinningPatternsClient";
 
 export default async function AnalysisPage() {
-  const { data } = await getSupabaseServerClient()
-    .from("own_post_analyses")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const data = await getLatestOwnPostAnalysis();
 
-  const initialAnalysis = data ? ownPostAnalysisRowToAnalysis(data as OwnPostAnalysisRow) : null;
+  const initialAnalysis = data ? ownPostAnalysisRowToAnalysis(data) : null;
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
