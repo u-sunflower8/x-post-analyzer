@@ -15,7 +15,10 @@ export async function analyzeWinningPatterns(request: AnalyzeRequest): Promise<A
       instruction:
         "以下のデータをもとに、伸びる投稿の共通点・伸びるテーマ・最適な投稿時間・" +
         "フォローされやすい投稿の特徴・改善ポイントの観点から、最低10件の勝ちパターン(insights)を" +
-        "生成してください。各insightは { id, title, description, evidence, category } の形で、" +
+        "生成してください。いいね(共感された)とリツイート(拡散された)は別の反応として区別し、" +
+        "topPostsはいいね数上位、topRepostedPostsはリツイート数上位の投稿です。" +
+        "両者の違い(共感される投稿と広まる投稿の差)にも触れてください。表示回数は判断材料にしないでください。" +
+        "各insightは { id, title, description, evidence, category } の形で、" +
         "categoryは timing|content|format|engagement|growth のいずれかにしてください。" +
         '出力形式: { "insights": [...] }',
       data: request,

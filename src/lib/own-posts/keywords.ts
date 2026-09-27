@@ -1,5 +1,4 @@
 import type { KeywordStat, OwnPostWithMetrics } from "@/types/own-post";
-import { likesAndReposts } from "./metrics";
 
 const STOPWORDS = new Set([
   "の", "に", "は", "を", "が", "と", "で", "も", "な", "い", "う", "する", "した", "ます", "です",
@@ -24,14 +23,15 @@ function tokenize(text: string): string[] {
 }
 
 export function computeTopKeywords(posts: OwnPostWithMetrics[]): KeywordStat[] {
-  const stats = new Map<string, { occurrences: number; totalLikesAndReposts: number }>();
+  const stats = new Map<string, { occurrences: number; totalLikes: number; totalReposts: number }>();
 
   for (const post of posts) {
     const tokens = new Set([...tokenize(post.text), ...extractHashtags(post.text).map((h) => h.toLowerCase())]);
     for (const token of tokens) {
-      const entry = stats.get(token) ?? { occurrences: 0, totalLikesAndReposts: 0 };
+      const entry = stats.get(token) ?? { occurrences: 0, totalLikes: 0, totalReposts: 0 };
       entry.occurrences += 1;
-      entry.totalLikesAndReposts += likesAndReposts(post);
+      entry.totalLikes += post.likeCount;
+      entry.totalReposts += post.repostCount;
       stats.set(token, entry);
     }
   }
@@ -41,8 +41,9 @@ export function computeTopKeywords(posts: OwnPostWithMetrics[]): KeywordStat[] {
     .map(([keyword, stat]) => ({
       keyword,
       occurrences: stat.occurrences,
-      avgLikesAndReposts: stat.totalLikesAndReposts / stat.occurrences,
+      avgLikes: stat.totalLikes / stat.occurrences,
+      avgReposts: stat.totalReposts / stat.occurrences,
     }))
-    .sort((a, b) => b.avgLikesAndReposts - a.avgLikesAndReposts)
+    .sort((a, b) => b.avgLikes - a.avgLikes)
     .slice(0, TOP_KEYWORD_COUNT);
 }

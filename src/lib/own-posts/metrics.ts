@@ -9,14 +9,6 @@ export function totalEngagements(post: OwnPost): number {
   return post.likeCount + post.repostCount + post.replyCount + post.quoteCount;
 }
 
-/**
- * What every "best"/"top" ranking is judged on. Impressions are deliberately
- * not used: posts imported from the X archive have none.
- */
-export function likesAndReposts(post: OwnPost): number {
-  return post.likeCount + post.repostCount;
-}
-
 function rate(numerator: number, impressions: number | null): number | null {
   if (!impressions || impressions <= 0) return null;
   return numerator / impressions;
@@ -64,7 +56,7 @@ export function computeEngagementMetrics(post: OwnPost): OwnPostMetrics {
     replyRate: rate(post.replyCount, impressions),
     clickThroughRate: rate(clicks, impressions),
     followRate: rate(post.followCount ?? 0, impressions),
-    engagementScore: likesAndReposts(post),
+    engagementScore: engagementRate !== null ? engagementRate * Math.log10((impressions ?? 0) + 1) : 0,
     dayOfWeek: jst.day,
     hourOfDay: jst.hour,
     charCountBucket: charCountBucket(Array.from(post.text).length),

@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ScoreBadge } from "@/components/posts/ScoreBadge";
 import type { OwnPostWithMetrics } from "@/types/own-post";
 
 function formatCount(n: number) {
@@ -49,7 +48,6 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
             <TableHead className="text-right">リポスト</TableHead>
             <TableHead className="text-right">返信</TableHead>
             <TableHead className="text-right">表示回数</TableHead>
-            <TableHead className="text-right">スコア</TableHead>
             <TableHead className="w-10" />
           </TableRow>
         </TableHeader>
@@ -82,9 +80,6 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
               </TableCell>
               <TableCell className="text-right text-sm text-neutral-700">
                 {post.impressionCount !== null ? formatCount(post.impressionCount) : "—"}
-              </TableCell>
-              <TableCell className="text-right">
-                <ScoreBadge score={post.metrics.engagementScore} />
               </TableCell>
               <TableCell>
                 {post.url && (

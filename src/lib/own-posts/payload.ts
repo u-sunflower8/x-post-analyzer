@@ -1,9 +1,10 @@
 import type { AccountSummary, AnalyzeRequest, OwnPostWithMetrics, PostBrief } from "@/types/own-post";
 import { aggregateByHour, aggregateByDayOfWeek, aggregateByCharCount } from "./aggregate";
 import { computeTopKeywords } from "./keywords";
-import { likesAndReposts } from "./metrics";
+import { median } from "./dashboard";
 
 const TOP_POST_COUNT = 18;
+const TOP_REPOSTED_POST_COUNT = 10;
 const BOTTOM_POST_COUNT = 10;
 const TEXT_TRUNCATE_LENGTH = 200;
 
@@ -20,13 +21,6 @@ export function toPostBrief(post: OwnPostWithMetrics): PostBrief {
 }
 
 export function buildAccountSummary(posts: OwnPostWithMetrics[]): AccountSummary {
-  const scores = posts.map(likesAndReposts).sort((a, b) => a - b);
-  const median =
-    scores.length === 0
-      ? 0
-      : scores.length % 2 === 0
-        ? (scores[scores.length / 2 - 1] + scores[scores.length / 2]) / 2
-        : scores[Math.floor(scores.length / 2)];
   const times = posts
     .map((p) => new Date(p.postedAt ?? p.createdAt).getTime())
     .filter((t) => !Number.isNaN(t));
@@ -35,18 +29,22 @@ export function buildAccountSummary(posts: OwnPostWithMetrics[]): AccountSummary
     postCount: posts.length,
     dateRangeStart: times.length > 0 ? new Date(Math.min(...times)).toISOString() : null,
     dateRangeEnd: times.length > 0 ? new Date(Math.max(...times)).toISOString() : null,
-    avgLikesAndReposts: posts.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / posts.length : 0,
-    medianLikesAndReposts: median,
+    avgLikes: posts.length > 0 ? posts.reduce((sum, p) => sum + p.likeCount, 0) / posts.length : 0,
+    medianLikes: median(posts.map((p) => p.likeCount)),
+    avgReposts: posts.length > 0 ? posts.reduce((sum, p) => sum + p.repostCount, 0) / posts.length : 0,
+    repostedPostShare: posts.length > 0 ? posts.filter((p) => p.repostCount > 0).length / posts.length : 0,
   };
 }
 
 export function buildAnalysisPayload(posts: OwnPostWithMetrics[]): AnalyzeRequest {
-  const byLikesAndReposts = [...posts].sort((a, b) => likesAndReposts(b) - likesAndReposts(a));
+  const byLikes = [...posts].sort((a, b) => b.likeCount - a.likeCount);
+  const byReposts = posts.filter((p) => p.repostCount > 0).sort((a, b) => b.repostCount - a.repostCount);
 
   return {
     summary: buildAccountSummary(posts),
-    topPosts: byLikesAndReposts.slice(0, TOP_POST_COUNT).map(toPostBrief),
-    bottomPosts: byLikesAndReposts.slice(-BOTTOM_POST_COUNT).reverse().map(toPostBrief),
+    topPosts: byLikes.slice(0, TOP_POST_COUNT).map(toPostBrief),
+    topRepostedPosts: byReposts.slice(0, TOP_REPOSTED_POST_COUNT).map(toPostBrief),
+    bottomPosts: byLikes.slice(-BOTTOM_POST_COUNT).reverse().map(toPostBrief),
     hourBuckets: aggregateByHour(posts),
     dayOfWeekBuckets: aggregateByDayOfWeek(posts),
     charCountBuckets: aggregateByCharCount(posts),

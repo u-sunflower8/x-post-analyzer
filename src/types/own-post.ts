@@ -45,20 +45,27 @@ export interface OwnPostWithMetrics extends OwnPost {
 
 export interface BucketStat {
   label: string;
-  /** Avg likes + reposts per post. Impressions are not used for ranking (X archive imports have none). */
-  avgLikesAndReposts: number;
   postCount: number;
+  avgLikes: number;
+  avgReposts: number;
 }
+
+export type BucketMetric = "avgLikes" | "avgReposts";
 
 export interface DashboardKpis {
   totalPosts: number;
   totalImpressions: number;
   totalEngagements: number;
-  avgLikesAndReposts: number;
-  medianLikesAndReposts: number;
+  avgLikes: number;
+  medianLikes: number;
+  avgReposts: number;
+  /** Share of posts that got at least one repost (0-1). Most posts get none. */
+  repostedPostShare: number;
   avgImpressionsPerPost: number;
-  bestPostingHour: number | null;
-  bestPostingDayOfWeek: number | null;
+  bestHourByLikes: number | null;
+  bestHourByReposts: number | null;
+  bestDayByLikes: number | null;
+  bestDayByReposts: number | null;
   totalFollowsGained: number;
   periodStart: string | null;
   periodEnd: string | null;
@@ -77,19 +84,25 @@ export interface AccountSummary {
   postCount: number;
   dateRangeStart: string | null;
   dateRangeEnd: string | null;
-  avgLikesAndReposts: number;
-  medianLikesAndReposts: number;
+  avgLikes: number;
+  medianLikes: number;
+  avgReposts: number;
+  repostedPostShare: number;
 }
 
 export interface KeywordStat {
   keyword: string;
   occurrences: number;
-  avgLikesAndReposts: number;
+  avgLikes: number;
+  avgReposts: number;
 }
 
 export interface AnalyzeRequest {
   summary: AccountSummary;
+  /** Top posts by likes (resonated). */
   topPosts: PostBrief[];
+  /** Top posts by reposts (spread). */
+  topRepostedPosts: PostBrief[];
   bottomPosts: PostBrief[];
   hourBuckets: BucketStat[];
   dayOfWeekBuckets: BucketStat[];
