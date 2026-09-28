@@ -44,37 +44,37 @@ export function PostDetailClient({
     <div className="mx-auto max-w-4xl px-6 py-10">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         検索に戻る
       </Link>
 
-      <div className="mb-8 rounded-lg border border-neutral-200 p-5">
+      <div className="mb-8 rounded-lg border border-border p-5">
         <div className="mb-3 flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-neutral-900">{post.authorName}</p>
-            <p className="text-xs text-neutral-400">
+            <p className="text-sm font-medium text-foreground">{post.authorName}</p>
+            <p className="text-xs text-muted-foreground/80">
               @{post.authorUsername}
               {post.authorFollowersCount !== null && ` ・ ${post.authorFollowersCount.toLocaleString()}フォロワー`}
             </p>
           </div>
           <ScoreBadge score={post.engagementScore} />
         </div>
-        <p className="mb-4 whitespace-pre-wrap text-sm leading-relaxed text-neutral-800">{post.text}</p>
-        <div className="flex items-center justify-between text-xs text-neutral-400">
+        <p className="mb-4 whitespace-pre-wrap text-sm leading-relaxed text-foreground">{post.text}</p>
+        <div className="flex items-center justify-between text-xs text-muted-foreground/80">
           <span>
             いいね {post.likeCount.toLocaleString()} ・ リポスト {post.repostCount.toLocaleString()} ・ 返信{" "}
             {post.replyCount.toLocaleString()}
           </span>
-          <a href={post.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-neutral-700">
+          <a href={post.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-secondary-foreground">
             Xで見る <ExternalLink className="h-3 w-3" />
           </a>
         </div>
       </div>
 
       {!analysis ? (
-        <div className="rounded-lg border border-dashed border-neutral-200 py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border py-16 text-center">
           <Button onClick={() => runAnalysis(false)} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             AI分析を実行

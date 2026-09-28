@@ -23,8 +23,8 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">ダッシュボード</h1>
-        <p className="mt-1 text-sm text-neutral-500">自分の投稿全体の傾向を確認します。</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">ダッシュボード</h1>
+        <p className="mt-1 text-sm text-muted-foreground">自分の投稿全体の傾向を確認します。</p>
       </div>
       <DashboardClient
         kpis={kpis}

@@ -76,7 +76,7 @@ function SortableHead({
       <button
         type="button"
         onClick={() => onSort(column)}
-        className={`inline-flex items-center gap-0.5 hover:text-neutral-900 ${active ? "text-neutral-900" : ""}`}
+        className={`inline-flex items-center gap-0.5 hover:text-foreground ${active ? "text-foreground" : ""}`}
       >
         {label}
         {active && <Arrow className="h-3 w-3" />}
@@ -113,7 +113,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-neutral-200 py-16 text-center text-sm text-neutral-500">
+      <div className="rounded-lg border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
         投稿がまだありません。Xから自動取得するか、CSV/スクショから追加してください。
       </div>
     );
@@ -167,7 +167,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
             ))}
           </SelectContent>
         </Select>
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-muted-foreground">
           {filtered ? `${visible.length}件 / 全${posts.length}件` : `全${posts.length}件`}
         </span>
         {filtered && (
@@ -177,17 +177,17 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
               setTheme(ALL);
               setHook(ALL);
             }}
-            className="text-xs text-neutral-500 underline hover:text-neutral-900"
+            className="text-xs text-muted-foreground underline hover:text-foreground"
           >
             絞り込みを解除
           </button>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-neutral-200">
+      <div className="overflow-hidden rounded-lg border border-border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-neutral-50 hover:bg-neutral-50">
+            <TableRow className="bg-muted/60 hover:bg-muted/60">
               <TableHead className="w-[42%]">投稿</TableHead>
               <SortableHead
                 label="いいね"
@@ -211,7 +211,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
           <TableBody>
             {visible.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-sm text-neutral-500">
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
                   条件に合う投稿がありません。
                 </TableCell>
               </TableRow>
@@ -220,41 +220,41 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
               <TableRow key={post.id} className="align-top">
                 <TableCell className="max-w-md">
                   <Link href={`/own-posts/${post.id}`} className="block hover:underline">
-                    <p className="line-clamp-3 text-sm text-neutral-800">{post.text}</p>
+                    <p className="line-clamp-3 text-sm text-foreground">{post.text}</p>
                   </Link>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground/80">
                     <span>{formatDate(post.postedAt)}</span>
                     {post.theme && (
-                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-600">
+                      <span className="rounded bg-secondary px-1.5 py-0.5 text-secondary-foreground">
                         {THEME_LABELS[post.theme]}
                       </span>
                     )}
                     {post.hook && (
-                      <span className="rounded border border-neutral-200 px-1.5 py-0.5 text-neutral-500">
+                      <span className="rounded border border-border px-1.5 py-0.5 text-muted-foreground">
                         {HOOK_LABELS[post.hook]}
                       </span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-right text-sm text-neutral-700">
+                <TableCell className="text-right text-sm text-secondary-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <Heart className="h-3.5 w-3.5 text-neutral-400" />
+                    <Heart className="h-3.5 w-3.5 text-muted-foreground/80" />
                     {formatCount(post.likeCount)}
                   </span>
                 </TableCell>
-                <TableCell className="text-right text-sm text-neutral-700">
+                <TableCell className="text-right text-sm text-secondary-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <Repeat2 className="h-3.5 w-3.5 text-neutral-400" />
+                    <Repeat2 className="h-3.5 w-3.5 text-muted-foreground/80" />
                     {formatCount(post.repostCount)}
                   </span>
                 </TableCell>
-                <TableCell className="text-right text-sm text-neutral-700">
+                <TableCell className="text-right text-sm text-secondary-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <MessageCircle className="h-3.5 w-3.5 text-neutral-400" />
+                    <MessageCircle className="h-3.5 w-3.5 text-muted-foreground/80" />
                     {formatCount(post.replyCount)}
                   </span>
                 </TableCell>
-                <TableCell className="text-right text-sm text-neutral-700">
+                <TableCell className="text-right text-sm text-secondary-foreground">
                   {post.impressionCount !== null ? formatCount(post.impressionCount) : "—"}
                 </TableCell>
                 <TableCell>
@@ -263,7 +263,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
                       href={post.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-neutral-300 hover:text-neutral-600"
+                      className="text-muted-foreground/60 hover:text-secondary-foreground"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>

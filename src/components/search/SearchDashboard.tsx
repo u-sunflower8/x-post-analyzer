@@ -59,19 +59,19 @@ export function SearchDashboard() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">投稿検索</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">投稿検索</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           条件を指定してXの投稿を検索し、エンゲージメントスコアでランキングします。
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 rounded-lg border border-neutral-200 bg-white p-5"
+        className="mb-8 rounded-lg border border-border bg-card p-5"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-4">
-            <Label htmlFor="keyword" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="keyword" className="mb-1.5 text-xs text-muted-foreground">
               キーワード
             </Label>
             <Input
@@ -83,7 +83,7 @@ export function SearchDashboard() {
           </div>
 
           <div>
-            <Label htmlFor="minLikes" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="minLikes" className="mb-1.5 text-xs text-muted-foreground">
               最低いいね数
             </Label>
             <Input
@@ -95,7 +95,7 @@ export function SearchDashboard() {
             />
           </div>
           <div>
-            <Label htmlFor="minReposts" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="minReposts" className="mb-1.5 text-xs text-muted-foreground">
               最低リポスト数
             </Label>
             <Input
@@ -107,7 +107,7 @@ export function SearchDashboard() {
             />
           </div>
           <div>
-            <Label htmlFor="minReplies" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="minReplies" className="mb-1.5 text-xs text-muted-foreground">
               最低返信数
             </Label>
             <Input
@@ -119,7 +119,7 @@ export function SearchDashboard() {
             />
           </div>
           <div>
-            <Label htmlFor="minFollowers" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="minFollowers" className="mb-1.5 text-xs text-muted-foreground">
               投稿者フォロワー数下限
             </Label>
             <Input
@@ -132,7 +132,7 @@ export function SearchDashboard() {
           </div>
 
           <div>
-            <Label htmlFor="startTime" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="startTime" className="mb-1.5 text-xs text-muted-foreground">
               検索期間（開始）
             </Label>
             <Input
@@ -145,7 +145,7 @@ export function SearchDashboard() {
             />
           </div>
           <div>
-            <Label htmlFor="endTime" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="endTime" className="mb-1.5 text-xs text-muted-foreground">
               検索期間（終了）
             </Label>
             <Input
@@ -158,7 +158,7 @@ export function SearchDashboard() {
             />
           </div>
           <div>
-            <Label htmlFor="maxResults" className="mb-1.5 text-xs text-neutral-500">
+            <Label htmlFor="maxResults" className="mb-1.5 text-xs text-muted-foreground">
               最大取得件数
             </Label>
             <Input
@@ -172,7 +172,7 @@ export function SearchDashboard() {
           </div>
         </div>
 
-        <p className="mt-3 text-xs text-neutral-400">
+        <p className="mt-3 text-xs text-muted-foreground/80">
           ※ X API の仕様上、検索期間は直近7日以内に限られます。
         </p>
 
@@ -187,7 +187,7 @@ export function SearchDashboard() {
       {hasSearched && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-neutral-700">
+            <h2 className="text-sm font-medium text-secondary-foreground">
               検索結果（{posts.length}件・エンゲージメントスコア順）
             </h2>
           </div>

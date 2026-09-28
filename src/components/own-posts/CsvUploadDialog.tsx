@@ -91,14 +91,14 @@ export function CsvUploadDialog() {
         />
 
         {loading && (
-          <p className="flex items-center gap-2 text-sm text-neutral-500">
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             処理中...
           </p>
         )}
 
         {result && (
-          <div className="rounded-md border border-neutral-200 p-3 text-sm text-neutral-700">
+          <div className="rounded-md border border-border p-3 text-sm text-secondary-foreground">
             <p>
               全{result.totalRows}行中 {result.acceptedRows}件を取り込みました
               {result.rejectedRows.length > 0 && `（${result.rejectedRows.length}件は不備によりスキップ）`}

@@ -12,8 +12,8 @@ export default async function AnalysisPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">勝ちパターン分析</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">勝ちパターン分析</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           自分の投稿全体から、伸びる投稿の共通点をAIが抽出します。
         </p>
       </div>

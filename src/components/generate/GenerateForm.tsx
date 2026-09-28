@@ -41,7 +41,7 @@ export function GenerateForm({ analysisId }: { analysisId: string }) {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="flex items-end gap-3">
         <div className="flex-1">
-          <Label htmlFor="genre" className="mb-1.5 text-xs text-neutral-500">
+          <Label htmlFor="genre" className="mb-1.5 text-xs text-muted-foreground">
             投稿ジャンル
           </Label>
           <Input

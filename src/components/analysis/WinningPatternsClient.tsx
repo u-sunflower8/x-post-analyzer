@@ -75,7 +75,7 @@ export function WinningPatternsClient({ initialAnalysis }: { initialAnalysis: Ow
   return (
     <div className="space-y-6">
       {insights.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-neutral-200 py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border py-16 text-center">
           <Button onClick={() => runAnalysis(false)} disabled={loadingAnalysis}>
             {loadingAnalysis ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             分析を実行
@@ -84,7 +84,7 @@ export function WinningPatternsClient({ initialAnalysis }: { initialAnalysis: Ow
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-neutral-700">勝ちパターン</h2>
+            <h2 className="text-sm font-medium text-secondary-foreground">勝ちパターン</h2>
             <Button variant="ghost" size="sm" onClick={() => runAnalysis(true)} disabled={loadingAnalysis}>
               {loadingAnalysis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
               再分析
@@ -94,25 +94,25 @@ export function WinningPatternsClient({ initialAnalysis }: { initialAnalysis: Ow
             const Icon = CATEGORY_ICONS[insight.category];
             const categoryLabel = WINNING_PATTERN_CATEGORY_LABELS[insight.category]?.label ?? insight.category;
             return (
-              <Card key={insight.id} className="border-neutral-200">
+              <Card key={insight.id} className="border-border">
                 <CardContent className="space-y-2 pt-6">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="gap-1">
                       <Icon className="h-3 w-3" />
                       {categoryLabel}
                     </Badge>
-                    <p className="text-sm font-medium text-neutral-900">{insight.title}</p>
+                    <p className="text-sm font-medium text-foreground">{insight.title}</p>
                   </div>
-                  <p className="text-sm text-neutral-700">{insight.description}</p>
-                  <p className="text-xs text-neutral-500">根拠: {insight.evidence}</p>
+                  <p className="text-sm text-secondary-foreground">{insight.description}</p>
+                  <p className="text-xs text-muted-foreground">根拠: {insight.evidence}</p>
                 </CardContent>
               </Card>
             );
           })}
 
-          <div className="rounded-lg border border-neutral-200 p-5">
+          <div className="rounded-lg border border-border p-5">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-neutral-700">この勝ちパターンから投稿案を作る</h3>
+              <h3 className="text-sm font-medium text-secondary-foreground">この勝ちパターンから投稿案を作る</h3>
               <Button onClick={() => runGenerate(drafts.length > 0)} disabled={loadingDrafts} size="sm">
                 {loadingDrafts ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
                 {drafts.length > 0 ? "再生成" : "生成"}
@@ -122,11 +122,11 @@ export function WinningPatternsClient({ initialAnalysis }: { initialAnalysis: Ow
             {drafts.length > 0 && (
               <div className="space-y-3">
                 {drafts.map((draft) => (
-                  <Card key={draft.id} className="border-neutral-200">
+                  <Card key={draft.id} className="border-border">
                     <CardContent className="space-y-2 pt-6">
-                      <p className="whitespace-pre-wrap text-sm text-neutral-900">{draft.text}</p>
-                      <p className="text-xs text-neutral-500">根拠: {draft.rationale}</p>
-                      <p className="text-xs text-neutral-400">活用パターン: {draft.basedOnPattern}</p>
+                      <p className="whitespace-pre-wrap text-sm text-foreground">{draft.text}</p>
+                      <p className="text-xs text-muted-foreground">根拠: {draft.rationale}</p>
+                      <p className="text-xs text-muted-foreground/80">活用パターン: {draft.basedOnPattern}</p>
                       <Button variant="ghost" size="sm" onClick={() => copyToClipboard(draft.text)}>
                         <Copy className="h-3.5 w-3.5" />
                         コピー

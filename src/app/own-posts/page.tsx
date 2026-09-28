@@ -16,8 +16,8 @@ export default async function OwnPostsPage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-neutral-900">自分の投稿</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">自分の投稿</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             自分の過去投稿を集めて、ダッシュボードや勝ちパターン分析の元データにします。
           </p>
         </div>

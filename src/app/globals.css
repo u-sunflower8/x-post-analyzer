@@ -29,6 +29,7 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-star: var(--star);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -49,72 +50,76 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --font-sans: var(--font-rounded);
+  /* Palette and type follow the FIRE診断 app (fire-diagnosis) so the two feel like one brand. */
+  --background: #f5e6d1; /* warm beige */
+  --foreground: #4a3728; /* soft brown ink */
+  --card: #fffdf9; /* ivory white */
+  --card-foreground: #4a3728;
+  --popover: #fffdf9;
+  --popover-foreground: #4a3728;
+  --primary: #c8813f; /* warm orange-brown (くまさん) */
+  --primary-foreground: #fffdf9;
+  --secondary: #f0e2c4; /* cream */
+  --secondary-foreground: #6b5636;
+  --muted: #eddcbf;
+  --muted-foreground: #9c8465;
+  --accent: #f0e2c4;
+  --accent-foreground: #6b5636;
+  --star: #f2c14e;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: #e8d2ab;
+  --input: #e8d2ab;
+  --ring: #c8813f;
+  --chart-1: #c8813f;
+  --chart-2: #f0977e;
+  --chart-3: #9cc6a0;
+  --chart-4: #e8c77e;
+  --chart-5: #d98b5f;
+  --radius: 0.75rem;
+  --sidebar: #fffdf9;
+  --sidebar-foreground: #4a3728;
+  --sidebar-primary: #c8813f;
+  --sidebar-primary-foreground: #fffdf9;
+  --sidebar-accent: #f0e2c4;
+  --sidebar-accent-foreground: #6b5636;
+  --sidebar-border: #e8d2ab;
+  --sidebar-ring: #c8813f;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #3a2c2a;
+  --foreground: #f8e9e4;
+  --card: #4a3936;
+  --card-foreground: #f8e9e4;
+  --popover: #4a3936;
+  --popover-foreground: #f8e9e4;
+  --primary: #e8c2a6;
+  --primary-foreground: #3a2c2a;
+  --secondary: #5c4c3a;
+  --secondary-foreground: #f8e9e4;
+  --muted: #4f3e3b;
+  --muted-foreground: #cbb2a8;
+  --accent: #d98b5f;
+  --accent-foreground: #2a2b2e;
+  --star: #f2c14e;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --ring: #e8c2a6;
+  --chart-1: #e8c2a6;
+  --chart-2: #f0977e;
+  --chart-3: #9cc6a0;
+  --chart-4: #e8c77e;
+  --chart-5: #d98b5f;
+  --sidebar: #4a3936;
+  --sidebar-foreground: #f8e9e4;
+  --sidebar-primary: #e8c2a6;
+  --sidebar-primary-foreground: #3a2c2a;
+  --sidebar-accent: #5c4c3a;
+  --sidebar-accent-foreground: #f8e9e4;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #e8c2a6;
 }
 
 @layer base {
@@ -123,8 +128,67 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "palt";
+    position: relative;
+    word-break: keep-all; /* fallback: don't split words/particles across lines */
+    word-break: auto-phrase; /* Chrome: break at natural Japanese phrase boundaries */
+    overflow-wrap: anywhere; /* still allow breaking unbreakable long strings */
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans), "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN",
+      "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  }
+
+  /* kawaii watercolor wash */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(34% 26% at 10% 8%, rgba(240, 226, 196, 0.65), transparent 70%),
+      radial-gradient(28% 22% at 92% 14%, rgba(200, 129, 63, 0.18), transparent 70%),
+      radial-gradient(36% 28% at 14% 92%, rgba(240, 151, 126, 0.22), transparent 70%),
+      radial-gradient(32% 26% at 90% 88%, rgba(255, 253, 249, 0.7), transparent 70%);
+    filter: blur(50px);
+  }
+
+  /* soft sparkle dots */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.45;
+    background-image:
+      radial-gradient(circle, rgba(255, 255, 255, 0.95) 1px, transparent 1.6px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.75) 1px, transparent 1.6px);
+    background-size: 160px 160px, 100px 100px;
+    background-position: 0 0, 55px 70px;
+    animation: kawaii-twinkle 7s ease-in-out infinite;
+  }
+
+  @keyframes kawaii-twinkle {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after {
+      animation: none;
+    }
+  }
+
+  /* soft-edged illustration: a true circle with a wide, blurred fade instead of a hard boundary */
+  .fade-edge {
+    -webkit-mask-image: radial-gradient(circle closest-side at 50% 50%, black 62%, transparent 100%);
+    mask-image: radial-gradient(circle closest-side at 50% 50%, black 62%, transparent 100%);
   }
 }

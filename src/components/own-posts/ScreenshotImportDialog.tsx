@@ -181,9 +181,9 @@ export function ScreenshotImportDialog() {
 
         <div className="space-y-4">
           {rows.map((row) => (
-            <div key={row.id} className="rounded-md border border-neutral-200 p-3">
+            <div key={row.id} className="rounded-md border border-border p-3">
               {row.status === "processing" && (
-                <p className="flex items-center gap-2 text-sm text-neutral-500">
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   読み取り中...
                 </p>
@@ -194,7 +194,7 @@ export function ScreenshotImportDialog() {
                   <Textarea value={row.text} onChange={(e) => updateRow(row.id, { text: e.target.value })} rows={2} />
                   <div className="grid grid-cols-4 gap-2">
                     <div>
-                      <Label className="mb-1 text-xs text-neutral-500">投稿日時</Label>
+                      <Label className="mb-1 text-xs text-muted-foreground">投稿日時</Label>
                       <Input
                         value={row.createdAt}
                         placeholder="YYYY-MM-DD HH:mm"
@@ -202,15 +202,15 @@ export function ScreenshotImportDialog() {
                       />
                     </div>
                     <div>
-                      <Label className="mb-1 text-xs text-neutral-500">表示回数</Label>
+                      <Label className="mb-1 text-xs text-muted-foreground">表示回数</Label>
                       <Input value={row.impressions} onChange={(e) => updateRow(row.id, { impressions: e.target.value })} />
                     </div>
                     <div>
-                      <Label className="mb-1 text-xs text-neutral-500">リポスト</Label>
+                      <Label className="mb-1 text-xs text-muted-foreground">リポスト</Label>
                       <Input value={row.retweets} onChange={(e) => updateRow(row.id, { retweets: e.target.value })} />
                     </div>
                     <div>
-                      <Label className="mb-1 text-xs text-neutral-500">いいね</Label>
+                      <Label className="mb-1 text-xs text-muted-foreground">いいね</Label>
                       <Input value={row.likes} onChange={(e) => updateRow(row.id, { likes: e.target.value })} />
                     </div>
                   </div>

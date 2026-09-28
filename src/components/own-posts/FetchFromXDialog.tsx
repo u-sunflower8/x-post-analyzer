@@ -65,7 +65,7 @@ export function FetchFromXDialog() {
         </DialogHeader>
 
         <div>
-          <Label htmlFor="username" className="mb-1.5 text-xs text-neutral-500">
+          <Label htmlFor="username" className="mb-1.5 text-xs text-muted-foreground">
             ユーザー名（@なし）
           </Label>
           <Input id="username" placeholder="例: yuko_sunflower" value={username} onChange={(e) => setUsername(e.target.value)} />
