@@ -1,16 +1,11 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Heart, Repeat2, MessageCircle, ExternalLink } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import type { OwnPostWithMetrics } from "@/types/own-post";
+import { Heart, Repeat2, MessageCircle, ExternalLink, ArrowDown, ArrowUp } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { OwnPostHook, OwnPostTheme, OwnPostWithMetrics } from "@/types/own-post";
 import { HOOK_LABELS, THEME_LABELS } from "@/lib/own-posts/themes";
 
 function formatCount(n: number) {
@@ -30,7 +25,92 @@ function formatDate(iso: string | null) {
   });
 }
 
+type SortKey = "postedAt" | "likeCount" | "repostCount";
+type SortDir = "desc" | "asc";
+
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: "postedAt:desc", label: "投稿日（新しい順）" },
+  { value: "postedAt:asc", label: "投稿日（古い順）" },
+  { value: "likeCount:desc", label: "いいね（多い順）" },
+  { value: "likeCount:asc", label: "いいね（少ない順）" },
+  { value: "repostCount:desc", label: "リポスト（多い順）" },
+  { value: "repostCount:asc", label: "リポスト（少ない順）" },
+];
+
+const ALL = "all";
+
+function sortValue(post: OwnPostWithMetrics, key: SortKey): number {
+  if (key === "postedAt") return post.postedAt ? new Date(post.postedAt).getTime() : 0;
+  return post[key];
+}
+
+function countBy<K extends string>(
+  posts: OwnPostWithMetrics[],
+  keyFn: (p: OwnPostWithMetrics) => K | null | undefined,
+) {
+  const counts = new Map<K, number>();
+  for (const p of posts) {
+    const k = keyFn(p);
+    if (k) counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function SortableHead({
+  label,
+  column,
+  sortKey,
+  sortDir,
+  onSort,
+}: {
+  label: string;
+  column: SortKey;
+  sortKey: SortKey;
+  sortDir: SortDir;
+  onSort: (key: SortKey) => void;
+}) {
+  const active = sortKey === column;
+  const Arrow = sortDir === "desc" ? ArrowDown : ArrowUp;
+  return (
+    <TableHead className="text-right">
+      <button
+        type="button"
+        onClick={() => onSort(column)}
+        className={`inline-flex items-center gap-0.5 hover:text-neutral-900 ${active ? "text-neutral-900" : ""}`}
+      >
+        {label}
+        {active && <Arrow className="h-3 w-3" />}
+      </button>
+    </TableHead>
+  );
+}
+
 export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
+  const [theme, setTheme] = useState<OwnPostTheme | typeof ALL>(ALL);
+  const [hook, setHook] = useState<OwnPostHook | typeof ALL>(ALL);
+  const [sortKey, setSortKey] = useState<SortKey>("postedAt");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const themeCounts = useMemo(() => countBy(posts, (p) => p.theme), [posts]);
+  const hookCounts = useMemo(() => countBy(posts, (p) => p.hook), [posts]);
+
+  const visible = useMemo(() => {
+    const filtered = posts.filter((p) => (theme === ALL || p.theme === theme) && (hook === ALL || p.hook === hook));
+    const sign = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => sign * (sortValue(a, sortKey) - sortValue(b, sortKey)));
+  }, [posts, theme, hook, sortKey, sortDir]);
+
+  // Clicking a column header sorts by it (many first); clicking again flips the order.
+  function handleHeaderSort(key: SortKey) {
+    if (key === sortKey) setSortDir(sortDir === "desc" ? "asc" : "desc");
+    else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  }
+
+  const filtered = theme !== ALL || hook !== ALL;
+
   if (posts.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-neutral-200 py-16 text-center text-sm text-neutral-500">
@@ -40,72 +120,160 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-neutral-50 hover:bg-neutral-50">
-            <TableHead className="w-[42%]">投稿</TableHead>
-            <TableHead className="text-right">いいね</TableHead>
-            <TableHead className="text-right">リポスト</TableHead>
-            <TableHead className="text-right">返信</TableHead>
-            <TableHead className="text-right">表示回数</TableHead>
-            <TableHead className="w-10" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {posts.map((post) => (
-            <TableRow key={post.id} className="align-top">
-              <TableCell className="max-w-md">
-                <Link href={`/own-posts/${post.id}`} className="block hover:underline">
-                  <p className="line-clamp-3 text-sm text-neutral-800">{post.text}</p>
-                </Link>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
-                  <span>{formatDate(post.postedAt)}</span>
-                  {post.theme && (
-                    <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-600">{THEME_LABELS[post.theme]}</span>
-                  )}
-                  {post.hook && (
-                    <span className="rounded border border-neutral-200 px-1.5 py-0.5 text-neutral-500">{HOOK_LABELS[post.hook]}</span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="text-right text-sm text-neutral-700">
-                <span className="inline-flex items-center gap-1">
-                  <Heart className="h-3.5 w-3.5 text-neutral-400" />
-                  {formatCount(post.likeCount)}
-                </span>
-              </TableCell>
-              <TableCell className="text-right text-sm text-neutral-700">
-                <span className="inline-flex items-center gap-1">
-                  <Repeat2 className="h-3.5 w-3.5 text-neutral-400" />
-                  {formatCount(post.repostCount)}
-                </span>
-              </TableCell>
-              <TableCell className="text-right text-sm text-neutral-700">
-                <span className="inline-flex items-center gap-1">
-                  <MessageCircle className="h-3.5 w-3.5 text-neutral-400" />
-                  {formatCount(post.replyCount)}
-                </span>
-              </TableCell>
-              <TableCell className="text-right text-sm text-neutral-700">
-                {post.impressionCount !== null ? formatCount(post.impressionCount) : "—"}
-              </TableCell>
-              <TableCell>
-                {post.url && (
-                  <a
-                    href={post.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-neutral-300 hover:text-neutral-600"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
-              </TableCell>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={theme} onValueChange={(v) => setTheme(v as OwnPostTheme | typeof ALL)}>
+          <SelectTrigger className="min-w-44" aria-label="テーマで絞り込み">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>テーマ：すべて</SelectItem>
+            {(Object.keys(THEME_LABELS) as OwnPostTheme[]).map((t) => (
+              <SelectItem key={t} value={t}>
+                {THEME_LABELS[t]}（{themeCounts.get(t) ?? 0}）
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={hook} onValueChange={(v) => setHook(v as OwnPostHook | typeof ALL)}>
+          <SelectTrigger className="min-w-44" aria-label="1行目の型で絞り込み">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>1行目の型：すべて</SelectItem>
+            {(Object.keys(HOOK_LABELS) as OwnPostHook[]).map((h) => (
+              <SelectItem key={h} value={h}>
+                {HOOK_LABELS[h]}（{hookCounts.get(h) ?? 0}）
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={`${sortKey}:${sortDir}`}
+          onValueChange={(v) => {
+            const [key, dir] = v.split(":") as [SortKey, SortDir];
+            setSortKey(key);
+            setSortDir(dir);
+          }}
+        >
+          <SelectTrigger className="min-w-44" aria-label="並び替え">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="text-xs text-neutral-500">
+          {filtered ? `${visible.length}件 / 全${posts.length}件` : `全${posts.length}件`}
+        </span>
+        {filtered && (
+          <button
+            type="button"
+            onClick={() => {
+              setTheme(ALL);
+              setHook(ALL);
+            }}
+            className="text-xs text-neutral-500 underline hover:text-neutral-900"
+          >
+            絞り込みを解除
+          </button>
+        )}
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-neutral-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-neutral-50 hover:bg-neutral-50">
+              <TableHead className="w-[42%]">投稿</TableHead>
+              <SortableHead
+                label="いいね"
+                column="likeCount"
+                sortKey={sortKey}
+                sortDir={sortDir}
+                onSort={handleHeaderSort}
+              />
+              <SortableHead
+                label="リポスト"
+                column="repostCount"
+                sortKey={sortKey}
+                sortDir={sortDir}
+                onSort={handleHeaderSort}
+              />
+              <TableHead className="text-right">返信</TableHead>
+              <TableHead className="text-right">表示回数</TableHead>
+              <TableHead className="w-10" />
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {visible.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-neutral-500">
+                  条件に合う投稿がありません。
+                </TableCell>
+              </TableRow>
+            )}
+            {visible.map((post) => (
+              <TableRow key={post.id} className="align-top">
+                <TableCell className="max-w-md">
+                  <Link href={`/own-posts/${post.id}`} className="block hover:underline">
+                    <p className="line-clamp-3 text-sm text-neutral-800">{post.text}</p>
+                  </Link>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+                    <span>{formatDate(post.postedAt)}</span>
+                    {post.theme && (
+                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-600">
+                        {THEME_LABELS[post.theme]}
+                      </span>
+                    )}
+                    {post.hook && (
+                      <span className="rounded border border-neutral-200 px-1.5 py-0.5 text-neutral-500">
+                        {HOOK_LABELS[post.hook]}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right text-sm text-neutral-700">
+                  <span className="inline-flex items-center gap-1">
+                    <Heart className="h-3.5 w-3.5 text-neutral-400" />
+                    {formatCount(post.likeCount)}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right text-sm text-neutral-700">
+                  <span className="inline-flex items-center gap-1">
+                    <Repeat2 className="h-3.5 w-3.5 text-neutral-400" />
+                    {formatCount(post.repostCount)}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right text-sm text-neutral-700">
+                  <span className="inline-flex items-center gap-1">
+                    <MessageCircle className="h-3.5 w-3.5 text-neutral-400" />
+                    {formatCount(post.replyCount)}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right text-sm text-neutral-700">
+                  {post.impressionCount !== null ? formatCount(post.impressionCount) : "—"}
+                </TableCell>
+                <TableCell>
+                  {post.url && (
+                    <a
+                      href={post.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-neutral-300 hover:text-neutral-600"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
