@@ -113,7 +113,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg border border-dashed border-border bg-white py-16 text-center text-sm text-muted-foreground">
         投稿がまだありません。Xから自動取得するか、CSV/スクショから追加してください。
       </div>
     );
@@ -123,7 +123,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <Select value={theme} onValueChange={(v) => setTheme(v as OwnPostTheme | typeof ALL)}>
-          <SelectTrigger className="min-w-44" aria-label="テーマで絞り込み">
+          <SelectTrigger className="min-w-44 bg-white" aria-label="テーマで絞り込み">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -136,7 +136,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
           </SelectContent>
         </Select>
         <Select value={hook} onValueChange={(v) => setHook(v as OwnPostHook | typeof ALL)}>
-          <SelectTrigger className="min-w-44" aria-label="1行目の型で絞り込み">
+          <SelectTrigger className="min-w-44 bg-white" aria-label="1行目の型で絞り込み">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -156,7 +156,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
             setSortDir(dir);
           }}
         >
-          <SelectTrigger className="min-w-44" aria-label="並び替え">
+          <SelectTrigger className="min-w-44 bg-white" aria-label="並び替え">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -184,7 +184,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-lg border border-border bg-white">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/60 hover:bg-muted/60">
@@ -218,7 +218,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
             )}
             {visible.map((post) => (
               <TableRow key={post.id} className="align-top">
-                <TableCell className="max-w-md">
+                <TableCell className="max-w-md whitespace-normal">
                   <Link href={`/own-posts/${post.id}`} className="block hover:underline">
                     <p className="line-clamp-3 text-sm text-foreground">{post.text}</p>
                   </Link>

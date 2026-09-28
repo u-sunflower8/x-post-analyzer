@@ -54,7 +54,7 @@ export function OwnPostDetailClient({
         一覧に戻る
       </Link>
 
-      <div className="mb-8 rounded-lg border border-border p-5">
+      <div className="mb-8 rounded-lg border border-border bg-white p-5">
         <p className="mb-4 whitespace-pre-wrap text-sm leading-relaxed text-foreground">{post.text}</p>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
           <Stat label="表示回数" value={formatNumber(post.impressionCount)} />
@@ -72,7 +72,7 @@ export function OwnPostDetailClient({
       </div>
 
       {!suggestion ? (
-        <div className="rounded-lg border border-dashed border-border py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border bg-white py-16 text-center">
           <Button onClick={() => runSuggestion(false)} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             改善提案を実行

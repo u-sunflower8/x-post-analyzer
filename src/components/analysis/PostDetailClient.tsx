@@ -50,7 +50,7 @@ export function PostDetailClient({
         検索に戻る
       </Link>
 
-      <div className="mb-8 rounded-lg border border-border p-5">
+      <div className="mb-8 rounded-lg border border-border bg-white p-5">
         <div className="mb-3 flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-foreground">{post.authorName}</p>
@@ -74,7 +74,7 @@ export function PostDetailClient({
       </div>
 
       {!analysis ? (
-        <div className="rounded-lg border border-dashed border-border py-16 text-center">
+        <div className="rounded-lg border border-dashed border-border bg-white py-16 text-center">
           <Button onClick={() => runAnalysis(false)} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             AI分析を実行

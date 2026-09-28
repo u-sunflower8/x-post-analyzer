@@ -32,14 +32,14 @@ function formatDate(iso: string | null) {
 export function PostTable({ posts }: { posts: Post[] }) {
   if (posts.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg border border-dashed border-border bg-white py-16 text-center text-sm text-muted-foreground">
         投稿が見つかりません。検索条件を変更してください。
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
+    <div className="overflow-hidden rounded-lg border border-border bg-white">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/60 hover:bg-muted/60">
@@ -55,7 +55,7 @@ export function PostTable({ posts }: { posts: Post[] }) {
         <TableBody>
           {posts.map((post) => (
             <TableRow key={post.id} className="align-top">
-              <TableCell className="max-w-md">
+              <TableCell className="max-w-md whitespace-normal">
                 <Link href={`/posts/${post.id}`} className="block hover:underline">
                   <p className="line-clamp-3 text-sm text-foreground">{post.text}</p>
                 </Link>
