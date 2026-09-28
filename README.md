@@ -7,7 +7,7 @@ Xの運用を「他人のバズ」と「自分の実績」の両面からAIで�
 
 旧プロジェクト（React+Vite / OpenAI / LocalStorage版）をこのNext.js版に統合した。旧版の要件定義は [要件定義書.md](./要件定義書.md) を参照（自分の投稿分析部分の背景・要件はここに記載されている）。
 
-## 現状（2026-09-27時点）
+## 現状（2026-09-29時点）
 
 - **本番URL**: https://x-post-analyzer-gamma.vercel.app （Vercelプロジェクト `x-post-analyzer`, scope `ai-project8`）
 - **アプリ全体にBasic認証がかかっている**（自分以外に見せないため）。ユーザー名は空欄でOK、パスワードは`ADMIN_PASSWORD`環境変数の値（Vercelダッシュボード → Settings → Environment Variablesで確認できる）。
@@ -51,10 +51,17 @@ npm run dev
 |---|---|
 | `/` | バズ投稿検索・ランキング |
 | `/posts/[id]` | バズ投稿の詳細・AI分析・投稿案生成 |
-| `/dashboard` | 自分の投稿のKPIダッシュボード（時間帯・曜日・文字数ごとの傾向） |
-| `/own-posts` | 自分の投稿一覧（CSVアップロード・スクショ取込・Xから自動取得） |
+| `/dashboard` | 自分の投稿のKPIダッシュボード（時間帯・曜日・文字数ごとの傾向、テーマ別・1行目の型別の成績表） |
+| `/own-posts` | 自分の投稿一覧（テーマ・1行目の型での絞り込み、投稿日・いいね・リポストでの並び替え、CSVアップロード・スクショ取込・Xから自動取得） |
 | `/own-posts/[id]` | 自分の投稿の詳細・改善提案 |
 | `/analysis` | 自分の投稿の勝ちパターン分析・そこからの投稿案生成 |
+
+### デザイン
+
+色とフォントは、ユーザーの別アプリ「FIREタイプ診断」（`../../fire-diagnosis`、https://fire-diagnosis-nine.vercel.app/）に揃えている。`src/app/globals.css`の`:root`変数がパレットの定義元（ベージュ背景`#f5e6d1`、アイボリーのカード`#fffdf9`、メイン色のオレンジブラウン`#c8813f`、文字色`#4a3728`）。フォントはM PLUS Rounded 1c。
+
+- 色は`text-neutral-*`のような直書きをせず、`text-foreground`・`text-muted-foreground`・`bg-primary`・`border-border`などのテーマトークンを使う。
+- 投稿本文を表示する表や枠は、読みやすさのため背景を白（`bg-white`）にしている（ユーザーの要望）。
 
 ## 自分の投稿データの集め方
 
@@ -73,6 +80,14 @@ Xには投稿ごとのCSV書き出し機能が公式には無いため、以下�
 - 比べる値は1投稿あたりの平均。**投稿が20件未満の時間帯や曜日はベスト判定の対象外**にしている（`MIN_BUCKET_SAMPLE_SIZE`）。数件の偶然の当たりで決まらないようにするため。
 - 時間帯・曜日は**日本時間（Asia/Tokyo）**で集計する。サーバー（Vercel）はUTCで動くので、`getHours()`をそのまま使わないこと。
 - 勝ちパターン分析（AI）には、いいね上位（`topPosts`）とリツイート上位（`topRepostedPosts`）を分けて渡す。
+
+## 投稿のテーマ分類（2026-09-28〜）
+
+`own_posts.theme`（投資・FIRE・社会ネタなど8種類）と`own_posts.hook`（1行目の型、問いかけ・あるあるなど7種類）の2列がある。コードとラベルの対応は`src/lib/own-posts/themes.ts`で定義している。
+
+- 過去427件は、Claudeが全件読んで手作業で分類した。元データはリポジトリの外の`../analysis-2026-09/theme-labels.json`にあり、`node --env-file=.env.local scripts/import-theme-labels.mjs <json>`で投入する（まずお試し実行、問題なければ`--apply`）。
+- 新しく取り込んだ投稿は、未分類（null）のまま。取り込み処理はtheme/hookを上書きしない。
+- ダッシュボードの「自分比」は、いいね数 ÷ 直前30投稿のいいね中央値。フォロワー増加の影響を除くための指標で、3倍以上をバズとして数える（`src/lib/own-posts/content.ts`）。
 
 ## 主な制約
 
