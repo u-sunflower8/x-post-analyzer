@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { BucketMetric, BucketStat, DashboardKpis } from "@/types/own-post";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { BucketMetric, BucketStat, ContentStat, DashboardKpis } from "@/types/own-post";
 import { MIN_BUCKET_SAMPLE_SIZE } from "@/lib/own-posts/constants";
 
 const DAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
@@ -64,6 +65,50 @@ function EngagementBarChart({ title, data, metric }: { title: string; data: Buck
   );
 }
 
+function ContentStatTable({ title, stats }: { title: string; stats: ContentStat[] }) {
+  return (
+    <Card className="border-neutral-200">
+      <CardHeader>
+        <CardTitle className="text-sm text-neutral-500">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>分類</TableHead>
+              <TableHead className="text-right">件数</TableHead>
+              <TableHead className="text-right">自分比</TableHead>
+              <TableHead className="text-right">バズ率</TableHead>
+              <TableHead className="text-right">平均いいね</TableHead>
+              <TableHead className="text-right">いいね中央値</TableHead>
+              <TableHead className="text-right">平均RT</TableHead>
+              <TableHead className="text-right">RTされた率</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {stats.map((s) => (
+              <TableRow key={s.key} className={s.postCount < MIN_BUCKET_SAMPLE_SIZE ? "text-neutral-400" : ""}>
+                <TableCell className="whitespace-nowrap">{s.label}</TableCell>
+                <TableCell className="text-right tabular-nums">{s.postCount}</TableCell>
+                <TableCell className="text-right tabular-nums font-medium">
+                  {s.relativeMedian !== null ? `${s.relativeMedian.toFixed(2)}倍` : "—"}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {s.buzzShare !== null ? `${(s.buzzShare * 100).toFixed(0)}%` : "—"}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">{s.avgLikes.toFixed(1)}</TableCell>
+                <TableCell className="text-right tabular-nums">{s.medianLikes.toFixed(0)}</TableCell>
+                <TableCell className="text-right tabular-nums">{s.avgReposts.toFixed(2)}</TableCell>
+                <TableCell className="text-right tabular-nums">{(s.repostedShare * 100).toFixed(0)}%</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
 function formatHour(hour: number | null) {
   return hour !== null ? `${hour}時台` : "—";
 }
@@ -77,11 +122,17 @@ export function DashboardClient({
   hourBuckets,
   dayOfWeekBuckets,
   charCountBuckets,
+  themeStats,
+  hookStats,
+  unclassifiedCount,
 }: {
   kpis: DashboardKpis;
   hourBuckets: BucketStat[];
   dayOfWeekBuckets: BucketStat[];
   charCountBuckets: BucketStat[];
+  themeStats: ContentStat[];
+  hookStats: ContentStat[];
+  unclassifiedCount: number;
 }) {
   const [metric, setMetric] = useState<BucketMetric>("avgLikes");
 
@@ -124,6 +175,17 @@ export function DashboardClient({
         <EngagementBarChart title="時間帯別" data={hourBuckets} metric={metric} />
         <EngagementBarChart title="曜日別" data={dayOfWeekBuckets} metric={metric} />
         <EngagementBarChart title="文字数別" data={charCountBuckets} metric={metric} />
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-xs text-neutral-400">
+          自分比＝いいね数 ÷ 直前30投稿のいいね中央値（フォロワー増加の影響を除くため）。1.00倍がいつも通り、3倍以上をバズとして数えています。
+          {unclassifiedCount > 0 && ` 未分類の投稿が${unclassifiedCount}件あり、この表には含まれていません。`}
+        </p>
+        <div className="grid grid-cols-1 gap-4">
+          <ContentStatTable title="テーマ別" stats={themeStats} />
+          <ContentStatTable title="1行目の型別" stats={hookStats} />
+        </div>
       </div>
     </div>
   );

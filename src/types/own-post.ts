@@ -20,8 +20,15 @@ export interface OwnPost {
   mediaViewCount: number | null;
   mediaEngagementCount: number | null;
   isPromoted: boolean;
+  /** Topic label; undefined/null until the post has been classified. */
+  theme?: OwnPostTheme | null;
+  /** Opening-line style label; undefined/null until classified. */
+  hook?: OwnPostHook | null;
   createdAt: string;
 }
+
+export type OwnPostTheme = "inv" | "fire" | "society" | "love" | "life" | "save" | "daily" | "community";
+export type OwnPostHook = "ask" | "aruaru" | "data" | "claim" | "list" | "story" | "greet";
 
 export type CharCountBucket = "0-50" | "51-100" | "101-150" | "151-200" | "201-280" | "281+";
 
@@ -48,6 +55,22 @@ export interface BucketStat {
   postCount: number;
   avgLikes: number;
   avgReposts: number;
+}
+
+/** Performance of one content category (theme or opening-line style). */
+export interface ContentStat {
+  key: string;
+  label: string;
+  postCount: number;
+  avgLikes: number;
+  medianLikes: number;
+  avgReposts: number;
+  /** Share of posts that got at least one repost (0-1). */
+  repostedShare: number;
+  /** Median of likes ÷ the account's recent baseline; null when no post has enough history. */
+  relativeMedian: number | null;
+  /** Share of posts at 3x+ of their baseline (0-1). */
+  buzzShare: number | null;
 }
 
 export type BucketMetric = "avgLikes" | "avgReposts";

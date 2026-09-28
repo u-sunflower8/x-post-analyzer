@@ -3,7 +3,7 @@ import { fetchOwnTimeline } from "@/lib/x-api/own-timeline";
 import { XApiNotConfiguredError } from "@/lib/x-api/client";
 import { upsertOwnPosts } from "@/lib/db/queries";
 import { ownPostRowToOwnPost } from "@/lib/db/mappers";
-import type { OwnPostRow } from "@/lib/db/types";
+import type { OwnPostInsertRow } from "@/lib/db/types";
 import type { OwnPost } from "@/types/own-post";
 
 export async function POST(request: Request) {
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   // created_at はDB側の「取り込み時刻」を表すため、クライアント側の値では上書きしない
   // （挿入時はDEFAULT now()、既存行の更新時は元の値を保持する）。
-  const rows: Omit<OwnPostRow, "created_at">[] = posts.map((p) => ({
+  const rows: OwnPostInsertRow[] = posts.map((p) => ({
     id: p.id,
     source: p.source,
     text: p.text,

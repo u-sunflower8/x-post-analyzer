@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { listOwnPosts, upsertOwnPosts } from "@/lib/db/queries";
 import { ownPostRowToOwnPost } from "@/lib/db/mappers";
 import { withMetrics } from "@/lib/own-posts/metrics";
-import type { OwnPostRow } from "@/lib/db/types";
+import type { OwnPostInsertRow } from "@/lib/db/types";
 import type { OwnPost } from "@/types/own-post";
 
 export async function GET(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "posts is required" }, { status: 400 });
   }
 
-  const rows: Omit<OwnPostRow, "created_at">[] = posts.map((p) => ({
+  const rows: OwnPostInsertRow[] = posts.map((p) => ({
     id: p.id,
     source: p.source,
     text: p.text,

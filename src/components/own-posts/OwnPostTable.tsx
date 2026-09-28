@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { OwnPostWithMetrics } from "@/types/own-post";
+import { HOOK_LABELS, THEME_LABELS } from "@/lib/own-posts/themes";
 
 function formatCount(n: number) {
   if (n >= 10000) return `${(n / 10000).toFixed(1)}万`;
@@ -58,7 +59,15 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
                 <Link href={`/own-posts/${post.id}`} className="block hover:underline">
                   <p className="line-clamp-3 text-sm text-neutral-800">{post.text}</p>
                 </Link>
-                <p className="mt-1 text-xs text-neutral-400">{formatDate(post.postedAt)}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+                  <span>{formatDate(post.postedAt)}</span>
+                  {post.theme && (
+                    <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-600">{THEME_LABELS[post.theme]}</span>
+                  )}
+                  {post.hook && (
+                    <span className="rounded border border-neutral-200 px-1.5 py-0.5 text-neutral-500">{HOOK_LABELS[post.hook]}</span>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-right text-sm text-neutral-700">
                 <span className="inline-flex items-center gap-1">

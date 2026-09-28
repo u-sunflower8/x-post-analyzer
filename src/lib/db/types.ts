@@ -56,8 +56,13 @@ export interface OwnPostRow {
   media_view_count: number | null;
   media_engagement_count: number | null;
   is_promoted: boolean;
+  theme: string | null;
+  hook: string | null;
   created_at: string;
 }
+
+/** Columns written by imports. theme/hook are labelled separately and never overwritten by re-imports. */
+export type OwnPostInsertRow = Omit<OwnPostRow, "created_at" | "theme" | "hook">;
 
 export interface OwnPostSuggestionRow {
   id: string;

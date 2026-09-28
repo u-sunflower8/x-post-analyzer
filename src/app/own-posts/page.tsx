@@ -9,7 +9,7 @@ import { FetchFromXDialog } from "@/components/own-posts/FetchFromXDialog";
 export const dynamic = "force-dynamic";
 
 export default async function OwnPostsPage() {
-  const rows = await listOwnPosts(200);
+  const rows = await listOwnPosts(1000);
   const posts = rows.map(ownPostRowToOwnPost).map(withMetrics);
 
   return (

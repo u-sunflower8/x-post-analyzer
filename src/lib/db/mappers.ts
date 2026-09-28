@@ -10,6 +10,7 @@ import type {
 import type { Post } from "@/types/post";
 import type { Analysis } from "@/lib/openai/schemas";
 import type { OwnPost, AnalyzeResponse, SuggestResponse, GenerateOwnResponse } from "@/types/own-post";
+import { isOwnPostHook, isOwnPostTheme } from "@/lib/own-posts/themes";
 
 export function postRowToPost(row: PostRow): Post {
   return {
@@ -91,6 +92,8 @@ export function ownPostRowToOwnPost(row: OwnPostRow): OwnPost {
     mediaViewCount: row.media_view_count,
     mediaEngagementCount: row.media_engagement_count,
     isPromoted: row.is_promoted,
+    theme: isOwnPostTheme(row.theme) ? row.theme : null,
+    hook: isOwnPostHook(row.hook) ? row.hook : null,
     createdAt: row.created_at,
   };
 }

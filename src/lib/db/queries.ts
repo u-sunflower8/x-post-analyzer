@@ -4,6 +4,7 @@ import type {
   AnalysisRow,
   GeneratedIdeaRow,
   OwnPostRow,
+  OwnPostInsertRow,
   OwnPostSuggestionRow,
   OwnPostAnalysisRow,
   OwnPostDraftRow,
@@ -131,7 +132,7 @@ export async function getOwnPostById(id: string): Promise<OwnPostRow | null> {
   return rows[0] ?? null;
 }
 
-export async function upsertOwnPosts(rows: Omit<OwnPostRow, "created_at">[]): Promise<OwnPostRow[]> {
+export async function upsertOwnPosts(rows: OwnPostInsertRow[]): Promise<OwnPostRow[]> {
   if (rows.length === 0) return [];
   const sql = getSql();
   const results = await Promise.all(
