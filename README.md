@@ -12,7 +12,7 @@ Xの運用を「他人のバズ」と「自分の実績」の両面からAIで�
 - **本番URL**: https://x-post-analyzer-gamma.vercel.app （Vercelプロジェクト `x-post-analyzer`, scope `ai-project8`）
 - **アプリ全体にBasic認証がかかっている**（自分以外に見せないため）。ユーザー名は空欄でOK、パスワードは`ADMIN_PASSWORD`環境変数の値（Vercelダッシュボード → Settings → Environment Variablesで確認できる）。
 - **データベースはNeon Postgres**（後述、2026-09-16にSupabaseから移行済み。Supabaseはもう使っていない）。
-- **X API(Bearer Token)は設定済み・PPU(従量課金)で稼働中**。ただしテストで使いすぎてクレジットが枯渇気味なので、`developer.x.com`の「Credits」ページで残高を確認してから使うこと。
+- **X API(Bearer Token)は設定済み・PPU(従量課金)で稼働中**。2026-09-17のテストでクレジットを使い切ったが、その後ユーザーが追加でチャージ済み。使う前に`developer.x.com`の「Credits」ページで残高を確認すること。
 - 自分の投稿データは2026-09-27にXのデータアーカイブから取り込み済み（返信・リツイートを除く通常投稿427件。うち6件は以前のCSV取り込み分を表示回数付きで残している）。
 
 ## セットアップ
