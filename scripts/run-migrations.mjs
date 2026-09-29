@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const sql = neon(process.env.DATABASE_URL);
 
-const files = ["supabase/migrations/0001_init.sql", "supabase/migrations/0002_own_posts.sql", "supabase/migrations/0003_own_post_themes.sql"];
+const files = ["db/migrations/0001_init.sql", "db/migrations/0002_own_posts.sql", "db/migrations/0003_own_post_themes.sql"];
 
 for (const file of files) {
   const content = readFileSync(file, "utf-8");

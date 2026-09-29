@@ -11,7 +11,7 @@ Xの運用を「他人のバズ」と「自分の実績」の両面からAIで�
 
 - **本番URL**: https://x-post-analyzer-gamma.vercel.app （Vercelプロジェクト `x-post-analyzer`, scope `ai-project8`）
 - **アプリ全体にBasic認証がかかっている**（自分以外に見せないため）。ユーザー名は空欄でOK、パスワードは`ADMIN_PASSWORD`環境変数の値（Vercelダッシュボード → Settings → Environment Variablesで確認できる）。
-- **データベースはNeon Postgres**（後述、2026-09-16にSupabaseから移行済み。Supabaseはもう使っていない）。
+- **データベースはNeon Postgres**（2026-09-16にSupabaseから移行済み。2026-09-29にSupabase関連の環境変数とフォルダ名も削除した）。
 - **X API(Bearer Token)は設定済み・PPU(従量課金)で稼働中**。2026-09-17のテストでクレジットを使い切ったが、その後ユーザーが追加でチャージ済み。使う前に`developer.x.com`の「Credits」ページで残高を確認すること。
 - 自分の投稿データは2026-09-27にXのデータアーカイブから取り込み済み（返信・リツイートを除く通常投稿427件。うち6件は以前のCSV取り込み分を表示回数付きで残している）。
 
@@ -31,7 +31,7 @@ cp .env.local.example .env.local
 | `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com) |
 | `ADMIN_PASSWORD` | 任意の文字列。アプリ全体のBasic認証のパスワードになる（`src/proxy.ts`参照）。 |
 
-Neonのテーブルは `supabase/migrations/` 配下のSQL（ディレクトリ名は移行前の名残だが中身は標準Postgres SQLでNeonでもそのまま使える）を順に適用して作成する。
+Neonのテーブルは `db/migrations/` 配下のSQLを順に適用して作成する。
 
 ```bash
 node --env-file=.env.local scripts/run-migrations.mjs
@@ -62,6 +62,8 @@ npm run dev
 
 - 色は`text-neutral-*`のような直書きをせず、`text-foreground`・`text-muted-foreground`・`bg-primary`・`border-border`などのテーマトークンを使う。
 - 投稿本文を表示する表や枠は、読みやすさのため背景を白（`bg-white`）にしている（ユーザーの要望）。
+- M PLUS Rounded 1cは日本語の文字が約300個のファイルに分かれている。全部をpreloadすると1ページ約4MBになるので、`preload: false`にしている（`src/app/layout.tsx`）。
+- 自分の投稿一覧は、最初に50件だけ表示し、「さらに表示」ボタンで追加する。全件を一度に描画するとHTMLが約2MBになるため。
 
 ## 自分の投稿データの集め方
 

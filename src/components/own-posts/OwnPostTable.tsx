@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Heart, Repeat2, MessageCircle, ExternalLink, ArrowDown, ArrowUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { OwnPostHook, OwnPostTheme, OwnPostWithMetrics } from "@/types/own-post";
+import type { OwnPostHook, OwnPostListItem, OwnPostTheme } from "@/types/own-post";
 import { HOOK_LABELS, THEME_LABELS } from "@/lib/own-posts/themes";
 
 function formatCount(n: number) {
@@ -39,14 +39,17 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
 
 const ALL = "all";
 
-function sortValue(post: OwnPostWithMetrics, key: SortKey): number {
+/** Rows rendered at first. Rendering all 400+ rows made the page ~2MB of HTML. */
+const PAGE_SIZE = 50;
+
+function sortValue(post: OwnPostListItem, key: SortKey): number {
   if (key === "postedAt") return post.postedAt ? new Date(post.postedAt).getTime() : 0;
   return post[key];
 }
 
 function countBy<K extends string>(
-  posts: OwnPostWithMetrics[],
-  keyFn: (p: OwnPostWithMetrics) => K | null | undefined,
+  posts: OwnPostListItem[],
+  keyFn: (p: OwnPostListItem) => K | null | undefined,
 ) {
   const counts = new Map<K, number>();
   for (const p of posts) {
@@ -85,7 +88,7 @@ function SortableHead({
   );
 }
 
-export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
+export function OwnPostTable({ posts }: { posts: OwnPostListItem[] }) {
   const [theme, setTheme] = useState<OwnPostTheme | typeof ALL>(ALL);
   const [hook, setHook] = useState<OwnPostHook | typeof ALL>(ALL);
   const [sortKey, setSortKey] = useState<SortKey>("postedAt");
@@ -110,6 +113,12 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
   }
 
   const filtered = theme !== ALL || hook !== ALL;
+
+  // Changing a filter or the sort order starts again from the first page.
+  const viewKey = `${theme}|${hook}|${sortKey}|${sortDir}`;
+  const [shown, setShown] = useState({ viewKey, limit: PAGE_SIZE });
+  const limit = shown.viewKey === viewKey ? shown.limit : PAGE_SIZE;
+  const rows = visible.slice(0, limit);
 
   if (posts.length === 0) {
     return (
@@ -216,7 +225,7 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
                 </TableCell>
               </TableRow>
             )}
-            {visible.map((post) => (
+            {rows.map((post) => (
               <TableRow key={post.id} className="align-top">
                 <TableCell className="max-w-md whitespace-normal">
                   <Link href={`/own-posts/${post.id}`} className="block hover:underline">
@@ -274,6 +283,17 @@ export function OwnPostTable({ posts }: { posts: OwnPostWithMetrics[] }) {
           </TableBody>
         </Table>
       </div>
+      {visible.length > limit && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShown({ viewKey, limit: limit + PAGE_SIZE })}
+            className="rounded-full border border-border bg-white px-5 py-2 text-sm font-medium text-secondary-foreground hover:bg-accent"
+          >
+            さらに{Math.min(PAGE_SIZE, visible.length - limit)}件表示（残り{visible.length - limit}件）
+          </button>
+        </div>
+      )}
     </div>
   );
 }

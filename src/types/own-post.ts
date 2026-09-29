@@ -27,6 +27,15 @@ export interface OwnPost {
   createdAt: string;
 }
 
+/**
+ * Just what the own-post list renders. The list ships every post to the
+ * client for filtering, so keeping this slim keeps the page small.
+ */
+export type OwnPostListItem = Pick<
+  OwnPost,
+  "id" | "text" | "postedAt" | "url" | "likeCount" | "repostCount" | "replyCount" | "impressionCount" | "theme" | "hook"
+>;
+
 export type OwnPostTheme = "inv" | "fire" | "society" | "love" | "life" | "save" | "daily" | "community";
 export type OwnPostHook = "ask" | "aruaru" | "data" | "claim" | "list" | "story" | "greet";
 
