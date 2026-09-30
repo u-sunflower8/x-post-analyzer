@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "ダッシュボード" },
   { href: "/own-posts", label: "自分の投稿" },
   { href: "/analysis", label: "勝ちパターン分析" },
+  { href: "/draft-check", label: "投稿案チェック" },
 ];
 
 export function Header() {

@@ -136,3 +136,22 @@ export const ExtractPostResponseSchema = z.object({
 });
 
 export type ExtractPostResponse = z.infer<typeof ExtractPostResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// Draft post improvement (投稿案チェック)
+// ---------------------------------------------------------------------------
+
+export const DraftRewriteSchema = z.object({
+  text: z.string(),
+  point: z.string(),
+});
+
+export const ImproveDraftResponseSchema = z.object({
+  summary: z.string(),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  rewrites: z.array(DraftRewriteSchema).min(1),
+});
+
+export type DraftRewrite = z.infer<typeof DraftRewriteSchema>;
+export type ImproveDraftResponse = z.infer<typeof ImproveDraftResponseSchema>;
